@@ -1,6 +1,6 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -15,25 +15,19 @@ from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 
-## オリジナルデータを読み込む
-df = pd.read_csv('growth_rate.csv')
+h = .02  # step size in the mesh
 
-## 主成分分析を行う
-from sklearn.decomposition import PCA
+df = pd.read_csv('growth_rate.csv') ## add data
+
+from sklearn.decomposition import PCA ## PCA
 dfs = df.iloc[:, 3:].apply(lambda x: (x-x.mean())/x.std(), axis=0)
 pca = PCA()
 feature = pca.fit(dfs)
 feature = pca.transform(dfs)
 
-##主成分をデータセットに設定
-datasets = [feature[:,[0,1]],feature[:,[1,2]],feature[:,[0,2]]]
-
-h = .02  # step size in the mesh
-
 names = ["Nearest Neighbors", "Linear SVM", "RBF SVM", "Gaussian Process",
          "Decision Tree", "Random Forest", "Neural Net", "AdaBoost",
          "Naive Bayes", "QDA"]
-
 
 classifiers = [
     KNeighborsClassifier(3),
@@ -47,15 +41,40 @@ classifiers = [
     GaussianNB(),
     QuadraticDiscriminantAnalysis()]
 
+X, y = make_classification(n_features=2, n_redundant=0, n_informative=2,
+                           random_state=1, n_clusters_per_class=1)
+rng = np.random.RandomState(2)
+X += 2 * rng.uniform(size=X.shape)
+linearly_separable = (X, y)
+
+datasets = [make_moons(noise=0.3, random_state=0),
+            make_circles(noise=0.2, factor=0.5, random_state=1),
+            linearly_separable
+            ]
+
 figure = plt.figure(figsize=(27, 9))
 i = 1
 # iterate over datasets
-for ds_cnt,ds in enumerate(datasets):
+for ds_cnt, ds in enumerate(datasets):
     # preprocess dataset, split into training and test part
-    X, y = (ds,df['sex'].replace('Male',1).replace('Female',0))
+    X, y = ds
+    # preprocess dataset, split into training and test part
+    if ds_cnt == 0: ## set original data
+        X = feature[:,[0,1]]
+        y = df['sex'].replace('Male',1)
+        y = y.replace('Female',0)
+    if ds_cnt == 1: ## set original data
+        X = feature[:,[1,2]]
+        y = df['sex'].replace('Male',1)
+        y = y.replace('Female',0)
+    if ds_cnt == 2: ## set original data
+        X = feature[:,[0,2]]
+        y = df['sex'].replace('Male',1)
+        y = y.replace('Female',0)
+    X,y = ds
     X = StandardScaler().fit_transform(X)
     X_train, X_test, y_train, y_test = \
-        train_test_split(X, y, test_size = 0.8 ,random_state=42)
+        train_test_split(X, y, test_size=.4, random_state=42)
 
     x_min, x_max = X[:, 0].min() - .5, X[:, 0].max() + .5
     y_min, y_max = X[:, 1].min() - .5, X[:, 1].max() + .5
@@ -65,7 +84,7 @@ for ds_cnt,ds in enumerate(datasets):
     # just plot the dataset first
     cm = plt.cm.RdBu
     cm_bright = ListedColormap(['#FF0000', '#0000FF'])
-    ax = plt.subplot(3, len(classifiers) + 1, i)
+    ax = plt.subplot(len(datasets), len(classifiers) + 1, i)
     if ds_cnt == 0:
         ax.set_title("Input data")
     # Plot the training points
@@ -82,7 +101,7 @@ for ds_cnt,ds in enumerate(datasets):
 
     # iterate over classifiers
     for name, clf in zip(names, classifiers):
-        ax = plt.subplot(3, len(classifiers) + 1, i)
+        ax = plt.subplot(len(datasets), len(classifiers) + 1, i)
         clf.fit(X_train, y_train)
         score = clf.score(X_test, y_test)
 
