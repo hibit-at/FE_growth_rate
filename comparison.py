@@ -20,7 +20,7 @@ df = pd.read_csv('growth_rate.csv')
 
 ## 主成分分析を行う
 from sklearn.decomposition import PCA
-dfs = df.iloc[:, 3:].apply(lambda x: (x-x.mean())/x.std(), axis=0)
+dfs = df.iloc[:, 3:]
 pca = PCA()
 feature = pca.fit(dfs)
 feature = pca.transform(dfs)
