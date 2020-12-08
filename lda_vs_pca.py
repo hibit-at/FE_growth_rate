@@ -13,8 +13,8 @@ df = pd.read_csv('growth_rate.csv')
 col_sex = df['sex'].replace('Male','b').replace('Female','r')
 
 #ここで主成分分析
-pca = PCA()
-feature = pca.fit(df.iloc[:,3:])
+pca = PCA() 
+pca.fit(df.iloc[:,3:])
 feature = pca.transform(df.iloc[:,3:])
 
 #ここで線形判別分析
