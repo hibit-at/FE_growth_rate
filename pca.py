@@ -23,5 +23,9 @@ fig, ax = plt.subplots(figsize=(10,10), dpi=100)
 ax.scatter(feature[:,0],feature[:,1],alpha=0) #空のマーカー
 #下のイテレーションでテキストラベルを貼り付ける
 for i,(name,PC1,PC2,col) in enumerate(zip(df['name'],feature[:,0],feature[:,1],col_sex)):
-    ax.annotate(name,(PC1,PC2),c = col)
+    ax.annotate(name,(PC1,PC2),c = col,fontname="MS Gothic")
 plt.show()
+
+# import matplotlib.font_manager
+
+# print([f.name for f in matplotlib.font_manager.fontManager.ttflist])

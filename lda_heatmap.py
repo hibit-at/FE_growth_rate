@@ -1,17 +1,20 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import sklearn
-from sklearn.model_selection import train_test_split
+import time
+from sklearn.decomposition import PCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import accuracy_score
-from sklearn.linear_model import LogisticRegression
-from matplotlib.colors import ListedColormap
-from sklearn.decomposition import PCA
+from sklearn.model_selection import train_test_split
+
+# 時間計測
+start = time.time()
 
 # データの作成
 df = pd.read_csv('growth_rate.csv')
 X = df.iloc[:, 3:].values
+t = df['sex'].replace('Male', 1).replace('Female', 0)
 x_train = X[:400]
 t_train = df.sex[:400].replace('Male', 0).replace('Female', 1)
 x_test = X[400:]
@@ -19,12 +22,12 @@ t_test = df.sex[400:].replace('Male', 0).replace('Female', 1)
 print(x_train.shape, t_train.shape)
 
 # ここで線形判別分析
-X = df.iloc[:, 3:]
-y = df['sex'].replace('Male', 1).replace('Female', 0)
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.4, random_state=0)
 lda = LinearDiscriminantAnalysis()
-lda.fit(X_train, y_train)
+lda.fit(x_train, t_train)
+
+# 予測精度
+print("経過時間: {0} [sec]".format(time.time()-start))
+print("予測精度: {0}".format(accuracy_score(t_test, lda.predict(x_test))))
 
 # ヒートマップ
 grange = 150

@@ -1,14 +1,14 @@
-from torch import optim
-import torch
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import sklearn
-import numpy as np
-from torch import nn
-import matplotlib.pyplot as plt
-from tqdm import tqdm
+import torch
 from sklearn.decomposition import PCA
+from torch import nn, optim
+from tqdm import tqdm
+from torch.utils.data import TensorDataset, DataLoader
 
-# Pytorch ... GPU使えるかの確認
+# Pytorch ... GPUが使えるならGPU
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 print(device)  # 使えるなら「cuda:0」
 
@@ -37,27 +37,34 @@ print(t_train.shape)
 print(x_test.shape)
 print(t_test.shape)
 
+dataset = TensorDataset(x_train, t_train)
+loader = DataLoader(dataset, batch_size=64, shuffle=True)
+
 # モデルの定義
 model = nn.Sequential(
-    nn.Linear(8, 128), nn.Sigmoid(),
-    nn.Linear(128, 1), nn.Sigmoid(),
+    nn.Linear(8, 64),
+    nn.BatchNorm1d(64),
+    nn.Sigmoid(),
+    nn.Linear(64, 1),
+    nn.Sigmoid(),
 )
 model.to(device)
 loss_fn = nn.MSELoss()
 optimizer = optim.SGD(model.parameters(), lr=0.01)
-model.train()
 
 # 学習開始
 loss_train = []
 loss_test = []
-epoch_num = 5000
+epoch_num = 1000
 for epoch in tqdm(range(epoch_num)):
-    x_train.to(device)
-    optimizer.zero_grad()
-    y = model(x_train)
-    loss = loss_fn(y, t_train)
-    loss.backward()
-    optimizer.step()
+    model.train()
+    for x, t in loader:
+        x.to(device)
+        optimizer.zero_grad()
+        y = model(x)
+        loss = loss_fn(y, t)
+        loss.backward()
+        optimizer.step()
     loss_train.append(loss_fn(model(x_train), t_train))
     loss_test.append(loss_fn(model(x_test), t_test))
 
@@ -78,13 +85,13 @@ x = px.reshape((4*grange*grange, 1))
 y = py.reshape((4*grange*grange, 1))
 xy = np.concatenate([x, y], 1)
 invX = pca.inverse_transform(xy)
-z = model(torch.Tensor(invX).to(device)) # CPU -> GPU
+z = model(torch.Tensor(invX).to(device))  # CPU -> GPU
 z = z.reshape(2*grange, 2*grange)
-z = z.to('cpu').detach().numpy() # GPU -> CPU
+z = z.to('cpu').detach().numpy()  # GPU -> CPU
 plt.contourf(px, py, z, alpha=1.0, cmap='coolwarm')
-Y = model(torch.Tensor(X).to(device)) # CPU -> GPU
-Y = Y.to('cpu').detach().numpy() #GPU -> CPU
-col_sex = ['b' if y < 0.5 else 'r' for y in Y]
+Y = model(torch.Tensor(X).to(device))  # CPU -> GPU
+Y = Y.to('cpu').detach().numpy()  # GPU -> CPU
+col_sex = ['b' if y < 0.4 else 'r' for y in Y]
 plt.scatter(tx[:, 0], tx[:, 1], color=col_sex)
 plt.ylim((-grange, grange))
 plt.xlim((-grange, grange))
