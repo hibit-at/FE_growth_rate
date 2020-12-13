@@ -1,14 +1,18 @@
-import numpy as np
-from keras.models import Sequential, model_from_json
-from keras.layers import Dense, Activation, BatchNormalization
-from keras.optimizers import RMSprop, SGD
-import pandas as pd
+import time
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from keras.layers import Activation, BatchNormalization, Dense
+from keras.models import Sequential, model_from_json
+from keras.optimizers import SGD, RMSprop
 from sklearn.decomposition import PCA
 from tensorflow.python.client import device_lib
 
 #Tensorflow ... GPUが使えるかの確認
 print(device_lib.list_local_devices())
+
+# 時間計測
+start = time.time()
 
 # データの作成
 df = pd.read_csv('growth_rate.csv')
@@ -32,10 +36,14 @@ model.add(Dense(1, activation='sigmoid'))
 model.compile(loss='mean_squared_error',
               optimizer=SGD(lr=0.01), metrics=['accuracy'])
 
+
 # 学習開始
 epoch_num = 1000
 history = model.fit(x_train, t_train, batch_size=64,
                     epochs=epoch_num, verbose=1, validation_data=(x_test, t_test))
+
+#経過時間
+print("経過時間: {0} [sec]".format(time.time()-start))
 
 # 学習率のグラフ
 plt.plot(range(1, epoch_num+1), history.history['loss'], label='training')

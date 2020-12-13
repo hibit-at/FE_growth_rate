@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import sklearn
 import torch
+import time
 from sklearn.decomposition import PCA
 from torch import nn, optim
 from tqdm import tqdm
@@ -11,6 +12,9 @@ from torch.utils.data import TensorDataset, DataLoader
 # Pytorch ... GPUが使えるならGPU
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 print(device)  # 使えるなら「cuda:0」
+
+# 時間計測
+start = time.time()
 
 # データの作成
 df = pd.read_csv('growth_rate.csv')
@@ -67,6 +71,9 @@ for epoch in tqdm(range(epoch_num)):
         optimizer.step()
     loss_train.append(loss_fn(model(x_train), t_train))
     loss_test.append(loss_fn(model(x_test), t_test))
+
+# 経過時間
+print("経過時間: {0} [sec]".format(time.time()-start))
 
 # 学習率のグラフ
 x = np.arange(1, epoch_num+1, 1)
