@@ -1,3 +1,4 @@
+from sklearn.decomposition import PCA
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -15,18 +16,17 @@ from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 
-## オリジナルデータを読み込む
+# オリジナルデータを読み込む
 df = pd.read_csv('growth_rate.csv')
 
-## 主成分分析を行う
-from sklearn.decomposition import PCA
+# 主成分分析を行う
 dfs = df.iloc[:, 3:]
 pca = PCA()
 feature = pca.fit(dfs)
 feature = pca.transform(dfs)
 
-##主成分をデータセットに設定
-datasets = [feature[:,[0,1]],feature[:,[1,2]],feature[:,[0,2]]]
+# 主成分をデータセットに設定
+datasets = [feature[:, [0, 1]], feature[:, [1, 2]], feature[:, [0, 2]]]
 
 h = .02  # step size in the mesh
 
@@ -50,12 +50,12 @@ classifiers = [
 figure = plt.figure(figsize=(27, 9))
 i = 1
 # iterate over datasets
-for ds_cnt,ds in enumerate(datasets):
+for ds_cnt, ds in enumerate(datasets):
     # preprocess dataset, split into training and test part
-    X, y = (ds,df['sex'].replace('Male',1).replace('Female',0))
+    X, y = (ds, df['sex'].replace('Male', 1).replace('Female', 0))
     X = StandardScaler().fit_transform(X)
-    X_train, X_test, y_train, y_test = \
-        train_test_split(X, y, test_size = 0.8 ,random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.8, random_state=42)
 
     x_min, x_max = X[:, 0].min() - .5, X[:, 0].max() + .5
     y_min, y_max = X[:, 1].min() - .5, X[:, 1].max() + .5

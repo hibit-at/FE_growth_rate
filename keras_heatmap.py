@@ -8,7 +8,7 @@ from keras.optimizers import SGD, RMSprop
 from sklearn.decomposition import PCA
 from tensorflow.python.client import device_lib
 
-#Tensorflow ... GPUが使えるかの確認
+# Tensorflow ... GPUが使えるかの確認
 print(device_lib.list_local_devices())
 
 # 時間計測
@@ -29,7 +29,7 @@ print(t_test.shape)
 
 # モデルの定義
 model = Sequential()
-model.add(Dense(64,input_dim=8))
+model.add(Dense(64, input_dim=8))
 model.add(BatchNormalization())
 model.add(Activation('sigmoid'))
 model.add(Dense(1, activation='sigmoid'))
@@ -42,7 +42,7 @@ epoch_num = 1000
 history = model.fit(x_train, t_train, batch_size=64,
                     epochs=epoch_num, verbose=1, validation_data=(x_test, t_test))
 
-#経過時間
+# 経過時間
 print("経過時間: {0} [sec]".format(time.time()-start))
 
 # 学習率のグラフ

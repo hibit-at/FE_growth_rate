@@ -30,12 +30,12 @@ plt.figure(figsize=(10,10))
 print(pca.components_[1])
 plt.subplot(2,1,1)
 plt.bar(range(1,9),pca.components_[1],tick_label = df.columns[3:])
-plt.title('主成分分析における第2主成分')
+plt.title('主成分分析における第2主成分',fontname="MS Gothic")
 
 #判別関数をグラフ化
 print(lda.coef_[0])
 plt.subplot(2,1,2)
 plt.bar(range(1,9),-lda.coef_[0],tick_label = df.columns[3:])
-plt.title('線形判別分析における判別関数')
+plt.title('線形判別分析における判別関数',fontname="MS Gothic")
 
 plt.show()

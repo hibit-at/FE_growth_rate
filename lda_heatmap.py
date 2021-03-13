@@ -38,11 +38,11 @@ px, py = np.meshgrid(np.arange(-grange, grange, 1),
                      np.arange(-grange, grange, 1))
 x = px.reshape((4*grange*grange, 1))
 y = py.reshape((4*grange*grange, 1))
-xy = np.concatenate([px, py], 1)
+xy = np.concatenate([x, y], 1)
 invX = pca.inverse_transform(xy)
 z = lda.transform(invX)
 z = z.reshape(2*grange, 2*grange)
-plt.contour(px, py, z, alpha=1.0, cmap='coolwarm')
+plt.contourf(px, py, z, alpha=1.0, cmap='coolwarm')
 Y = lda.predict(X)
 col_sex = ['b' if y == 0 else 'r' for y in Y]
 plt.scatter(tx[:, 0], tx[:, 1], color=col_sex)

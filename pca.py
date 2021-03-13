@@ -25,7 +25,3 @@ ax.scatter(feature[:,0],feature[:,1],alpha=0) #空のマーカー
 for i,(name,PC1,PC2,col) in enumerate(zip(df['name'],feature[:,0],feature[:,1],col_sex)):
     ax.annotate(name,(PC1,PC2),c = col,fontname="MS Gothic")
 plt.show()
-
-# import matplotlib.font_manager
-
-# print([f.name for f in matplotlib.font_manager.fontManager.ttflist])
