@@ -6,8 +6,8 @@ from sklearn.decomposition import PCA
 
 # オリジナルデータを読み込む
 df = pd.read_csv('growth_rate.csv')
-df = df[df['series']=='TH']
-
+filter = (df['series'] == 'EN')
+df = df[filter]
 # 後で性別のカラーラベルに使用するためにbとrに置き換えたものを作成
 col_sex = df['sex'].replace('Male', 'b').replace('Female', 'r')
 
